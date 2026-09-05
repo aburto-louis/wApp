@@ -8,6 +8,7 @@
   "files": {
     "includes": [
       "**",
+      "!**/bun.lock",
       "!**/dist",
       "!**/node_modules",
       "!**/.turbo",
