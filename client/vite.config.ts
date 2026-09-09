@@ -1,6 +1,5 @@
 import { defineConfig, loadEnv } from "vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
-import { fileURLToPath } from "node:url"
 import path from "node:path"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
@@ -25,9 +24,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(import.meta.dirname, "./src"),
-        "@000/server": fileURLToPath(
-          new URL("../server/src/client.ts", import.meta.url)
-        ),
       },
     },
     server: {

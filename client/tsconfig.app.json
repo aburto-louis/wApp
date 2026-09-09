@@ -5,8 +5,7 @@
     "types": ["vite/client"],
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"],
-      "@000/server": ["../server/src/client.ts"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

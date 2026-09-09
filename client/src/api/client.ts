@@ -1,3 +1,3 @@
-import { hcWithType, type Client } from "@000/server"
+import { hcWithType, type Client } from "server"
 
 export const client: Client = hcWithType("/api")

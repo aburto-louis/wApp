@@ -1,5 +1,5 @@
 {
-  "name": "@000/server",
+  "name": "server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
     "clean": "rm -rf .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@000/shared": "workspace:*",
+    "store": "workspace:*",
     "hono": "^4.13.5",
     "zod": "^4.5.4"
   },

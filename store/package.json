@@ -1,10 +1,11 @@
 {
-  "name": "@000/shared",
+  "name": "store",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

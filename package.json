@@ -6,7 +6,7 @@
   "workspaces": [
     "client",
     "server",
-    "shared"
+    "store"
   ],
   "scripts": {
     "dev": "turbo run dev",

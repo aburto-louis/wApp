@@ -6,8 +6,7 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
-      "@000/server": ["../server/src/client.ts"]
+      "@/*": ["./src/*"]
     }
   }
 }
