@@ -2,7 +2,7 @@
   "name": "000",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.4.0",
+  "packageManager": "bun@1.4.2",
   "workspaces": [
     "client",
     "server",
@@ -20,8 +20,8 @@
     "clean": "turbo run clean && rm -rf node_modules .turbo"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.11",
-    "turbo": "^2.10.12",
+    "@biomejs/biome": "2.5.14",
+    "turbo": "^2.11.2",
     "typescript": "^7.0.2"
   }
 }
