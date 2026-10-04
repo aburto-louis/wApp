@@ -1,8 +1,23 @@
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 import { ZodError } from "zod"
+import { toHttpError } from "./db/errors"
+import { currentVersion } from "./db/migrate"
+import db from "./db/sqlite"
 
 const app = new Hono()
+
+  .get("/health", (c) => {
+    try {
+      db.query("SELECT 1").get()
+
+      return c.json({ status: "ok", migration: currentVersion(db) })
+    } catch (err) {
+      console.error(err)
+
+      return c.json({ status: "unavailable" }, 503)
+    }
+  })
 
   // mount routes here;
 
@@ -15,17 +30,15 @@ const app = new Hono()
       return c.json({ error: "Validation failed", issues: err.issues }, 400)
     }
 
-    const msg = err instanceof Error ? err.message : String(err)
-
-    if (msg.includes("UNIQUE constraint failed")) {
-      return c.json({ error: "UNIQUE constraint violation" }, 409)
-    }
-
-    if (msg.includes("FOREIGN KEY constraint failed")) {
-      return c.json({ error: "FOREIGN KEY constraint violation" }, 400)
-    }
-
+    // The full SQLiteError, code and all, only ever goes to the log.
     console.error(err)
+
+    const database = toHttpError(err)
+
+    if (database) {
+      return c.json(database.body, database.status, database.headers)
+    }
+
     return c.json({ error: "Internal server error" }, 500)
   })
 

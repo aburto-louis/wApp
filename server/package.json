@@ -9,6 +9,10 @@
   "scripts": {
     "dev": "bun --watch --env-file=../.env src/index.ts",
     "start": "bun --env-file=../.env src/index.ts",
+    "db:migrate": "bun --env-file=../.env src/db/migrate.ts",
+    "db:status": "bun --env-file=../.env src/db/migrate.ts --status",
+    "db:reset": "rm -f src/db/data/db.sqlite src/db/data/db.sqlite-wal src/db/data/db.sqlite-shm",
+    "test": "bun test",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .turbo *.tsbuildinfo"
   },
