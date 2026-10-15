@@ -1,5 +1,3 @@
-# single .gitignore for entire workspace
-
 # dependencies
 node_modules
 

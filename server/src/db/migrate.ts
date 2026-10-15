@@ -1,7 +1,7 @@
 import { type Database, SQLiteError } from "bun:sqlite"
 import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { createDatabase, DB_PATH } from "./sqlite"
+import { createDatabase, DB_PATH } from "@/db/sqlite"
 
 const MIGRATIONS_DIR = join(import.meta.dir, "migrations")
 const FILENAME = /^(\d{3,})_([a-z0-9_]+)\.sql$/
@@ -109,7 +109,8 @@ export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
 }
 
 function ensureMigrationsTable(db: Database) {
-  db.run(`
+  db.run(
+    `
     CREATE TABLE IF NOT EXISTS schema_migrations (
       version     INTEGER PRIMARY KEY,
       name        TEXT    NOT NULL,
@@ -117,15 +118,18 @@ function ensureMigrationsTable(db: Database) {
       applied_at  INTEGER NOT NULL DEFAULT (unixepoch()),
       duration_ms INTEGER NOT NULL
     ) STRICT
-  `)
+    `
+  )
 }
 
 function appliedMigrations(db: Database): AppliedMigration[] {
   return db
     .query(
-      `SELECT version, name, checksum, applied_at, duration_ms
-       FROM schema_migrations
-       ORDER BY version`
+      `
+      SELECT version, name, checksum, applied_at, duration_ms
+      FROM schema_migrations
+      ORDER BY version
+      `
     )
     .all() as AppliedMigration[]
 }
@@ -183,8 +187,10 @@ function apply(db: Database, migration: Migration) {
   }
 
   db.run(
-    `INSERT INTO schema_migrations (version, name, checksum, duration_ms)
-     VALUES (?, ?, ?, ?)`,
+    `
+    INSERT INTO schema_migrations (version, name, checksum, duration_ms)
+    VALUES (?, ?, ?, ?)
+    `,
     [
       migration.version,
       migration.name,
@@ -311,8 +317,8 @@ if (import.meta.main) {
           : `Applied migrations: ${ran.join(", ")}`
       )
     }
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err)
     process.exitCode = 1
   } finally {
     db.close(false)

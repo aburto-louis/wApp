@@ -74,7 +74,7 @@ export function closeDatabase(): void {
  * time, so importing this module — as `./migrate` and the tests do — never
  * touches the filesystem.
  */
-const db = new Proxy({} as Database, {
+export const db = new Proxy({} as Database, {
   get(_target, property) {
     const database = getDatabase()
     const value = Reflect.get(database, property) as unknown
@@ -82,5 +82,3 @@ const db = new Proxy({} as Database, {
     return typeof value === "function" ? value.bind(database) : value
   },
 })
-
-export default db

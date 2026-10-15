@@ -1,34 +1,31 @@
-import app from "./app"
-import { pendingMigrations, runMigrations } from "./db/migrate"
-import db, { closeDatabase } from "./db/sqlite"
+import app from "@/app"
+import { pendingMigrations, runMigrations } from "@/db/migrate"
+import { closeDatabase, db } from "@/db/sqlite"
 
 const port = Number(process.env.PORT ?? 3000)
 
 try {
   if (process.env.NODE_ENV === "production") {
     const pending = pendingMigrations(db)
-
     if (pending.length > 0) {
       throw new Error(
-        `${pending.length} pending migration(s): ${pending.join(", ")}. ` +
-          "Run `bun run db:migrate` first."
+        `${pending.length} pending migration(s): ${pending.join(", ")}`
       )
     }
   } else {
     const ran = runMigrations(db)
-
     if (ran.length > 0) console.log(`Applied migrations: ${ran.join(", ")}`)
   }
-} catch (error) {
+} catch (err) {
   console.error(
-    `Refusing to boot — ${error instanceof Error ? error.message : error}`
+    `Refusing to boot server: ${err instanceof Error ? err.message : err}`
   )
   process.exit(1)
 }
 
 const server = Bun.serve({ port, fetch: app.fetch })
 
-console.log(`000 server listening on ${server.url}`)
+console.log(`recordbag server listening on ${server.url}`)
 
 async function shutdown() {
   await server.stop()
