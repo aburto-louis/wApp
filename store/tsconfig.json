@@ -4,7 +4,7 @@
     "lib": ["ES2023", "DOM"],
     "types": ["bun"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@str/*": ["./src/*"]
     }
   },
   "include": ["src"]

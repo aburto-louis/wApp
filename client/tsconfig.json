@@ -6,7 +6,9 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@svr/*": ["../server/src/*"],
+      "@str/*": ["../store/src/*"]
     }
   }
 }
