@@ -1,5 +1,5 @@
 import { hc } from "hono/client"
-import type app from "./app"
+import type app from "@server/app"
 
 type AppType = typeof app
 export type Client = ReturnType<typeof hc<AppType>>

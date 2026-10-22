@@ -10,17 +10,18 @@ function resolveDbPath(path: string): string {
   return path === MEMORY ? MEMORY : resolve(path)
 }
 
+/** `/absolute/path/to/db.sqlite` */
 export const DB_PATH = resolveDbPath(process.env.DB_PATH ?? DEFAULT_PATH)
 
 /**
- * Opens a connection and applies the per-connection pragmas. Migrations are
- * never run here — see `./migrate` and the boot sequence in `../index.ts`.
+ * creates db instance & applies connection pragmas
+ * @param path absolute path to db
+ * @returns db instance
  */
 export function createDatabase(path: string = DB_PATH): Database {
   const file = resolveDbPath(path)
-  const persistent = file !== MEMORY
 
-  // bun:sqlite creates the database file but never its parent directory.
+  const persistent = file !== MEMORY
   if (persistent) mkdirSync(dirname(file), { recursive: true })
 
   const db = new Database(file, { create: true, strict: true })
@@ -38,13 +39,11 @@ export function createDatabase(path: string = DB_PATH): Database {
     if (journal?.journal_mode !== "wal") {
       db.close(true)
       throw new Error(
-        `Could not enable WAL on ${file} — journal_mode is ` +
-          `"${journal?.journal_mode ?? "unknown"}". Some network filesystems ` +
-          "do not support it."
+        `could not enable WAL on ${file}` +
+          `journal_mode is "${journal?.journal_mode ?? "unknown"}"`
       )
     }
 
-    // Safe to lose only the last transaction on power loss, never the db.
     db.run("PRAGMA synchronous = NORMAL")
   }
 
@@ -53,11 +52,16 @@ export function createDatabase(path: string = DB_PATH): Database {
 
 let instance: Database | undefined
 
+/**
+ * if instance is undefined, creates new db instance
+ * @returns db instance
+ */
 export function getDatabase(): Database {
   instance ??= createDatabase()
   return instance
 }
 
+/** closes db & sets instance to undefined */
 export function closeDatabase(): void {
   if (!instance) return
 
@@ -70,15 +74,14 @@ export function closeDatabase(): void {
 }
 
 /**
- * The shared connection. Opened on first property access rather than at import
- * time, so importing this module — as `./migrate` and the tests do — never
- * touches the filesystem.
+ * opens on first property access rather than at import time
+ *
+ * importing this module never touches the filesystem
  */
 export const db = new Proxy({} as Database, {
   get(_target, property) {
     const database = getDatabase()
     const value = Reflect.get(database, property) as unknown
-
     return typeof value === "function" ? value.bind(database) : value
   },
 })

@@ -1,6 +1,6 @@
-import app from "@/app"
-import { pendingMigrations, runMigrations } from "@/db/migrate"
-import { closeDatabase, db } from "@/db/sqlite"
+import app from "@server/app"
+import { pendingMigrations, runMigrations } from "@server/db/migrate"
+import { closeDatabase, db } from "@server/db/sqlite"
 
 const port = Number(process.env.PORT ?? 3000)
 

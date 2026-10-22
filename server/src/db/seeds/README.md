@@ -14,8 +14,8 @@ Importing the shared connection no longer applies migrations. Call
 `runMigrations` first so a seed always runs against an up-to-date schema:
 
 ```ts
-import { db } from "../sqlite"
-import { runMigrations } from "../migrate"
+import { db } from "@server/db/sqlite"
+import { runMigrations } from "@server/db/migrate"
 
 runMigrations(db)
 db.run("INSERT INTO ...")

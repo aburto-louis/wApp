@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 import { ZodError } from "zod"
-import { toHttpError } from "@/db/errors"
+import { toHttpError } from "@server/db/errors"
 
 const app = new Hono()
 

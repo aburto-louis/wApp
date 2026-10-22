@@ -30,30 +30,30 @@ const DETAIL = /constraint failed: (.+)$/
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/
 
 /**
- * Pulls the offending columns out of a constraint message. SQLite writes them
- * as `UNIQUE constraint failed: users.email, users.tenant_id`.
+ * parse CONSTRAINT violation's offending fields
+ * @param message to be parsed
+ * @returns offending fields | undefined
  */
 function fieldsIn(message: string): string[] | undefined {
   const detail = DETAIL.exec(message)?.[1]
-
   if (!detail) return undefined
-
   return detail.split(", ").map((part) => part.split(".").at(-1) ?? part)
 }
 
 /**
- * A named CHECK reports its name, an anonymous one reports its expression.
- * Only the name is safe to hand back.
+ * parse CHECK violation's offending name
+ * @param message to be parsed
+ * @returns offending name | undefined
  */
 function constraintIn(message: string): string | undefined {
   const detail = DETAIL.exec(message)?.[1]
-
   return detail && IDENTIFIER.test(detail) ? detail : undefined
 }
 
 /**
- * Maps a `bun:sqlite` failure onto an HTTP response, or returns null when the
- * error did not come from the database.
+ * maps SQLiteError to HttpError
+ * @param error
+ * @returns HttpError | null
  */
 export function toHttpError(error: unknown): DatabaseHttpError | null {
   if (!(error instanceof SQLiteError)) return null
@@ -74,7 +74,6 @@ export function toHttpError(error: unknown): DatabaseHttpError | null {
       }
 
     case "SQLITE_CONSTRAINT_FOREIGNKEY":
-      // SQLite reports no detail for these, so there is nothing to surface.
       return {
         status: 409,
         body: {

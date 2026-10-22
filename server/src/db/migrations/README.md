@@ -12,12 +12,12 @@ Only `.sql` files are loaded, so this README is invisible to the runner.
 `NNN_name.sql` — a version of at least three digits, an underscore, then a
 snake_case description.
 
-| Filename                 | Verdict | Reason                              |
-| ------------------------ | ------- | ----------------------------------- |
-| `001_users.sql`          | Good    | —                                   |
-| `002_add_user_email.sql` | Good    | —                                   |
+| Filename                 | Verdict | Reason                                |
+| ------------------------ | ------- | ------------------------------------- |
+| `001_users.sql`          | Good    | —                                     |
+| `002_add_user_email.sql` | Good    | —                                     |
 | `1_users.sql`            | Throws  | Version must be at least three digits |
-| `users.sql`              | Throws  | Runner requires a `NNN_` prefix     |
+| `users.sql`              | Throws  | Runner requires a `NNN_` prefix       |
 
 Files are sorted by the parsed version number, not by filename. Padding is
 still the convention so listings stay readable.
