@@ -5,9 +5,7 @@
     "types": ["vite/client", "bun"],
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"],
-      "@server/*": ["../server/src/*"],
-      "@store/*": ["../store/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

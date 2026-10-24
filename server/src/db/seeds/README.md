@@ -2,16 +2,12 @@
 
 Standalone scripts that load data into the database.
 
-[`data/`](../data/) · [`migrations/`](../migrations/) · **`seeds/`**
-
 Git does not track empty directories. This file is the only tracked occupant.
-Nothing invokes seeds automatically — neither the server nor the migration
-runner knows they exist.
+Nothing invokes seeds automatically.
 
 ## Writing one
 
-Importing the shared connection no longer applies migrations. Call
-`runMigrations` first so a seed always runs against an up-to-date schema:
+Call `runMigrations` first so a seed always runs against an up-to-date schema:
 
 ```ts
 import { db } from "@server/db/sqlite"

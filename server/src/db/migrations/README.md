@@ -2,8 +2,6 @@
 
 Applied schema history — the only directory the migration runner reads.
 
-[`data/`](../data/) · **`migrations/`** · [`seeds/`](../seeds/)
-
 Git does not track empty directories. This file is the only tracked occupant.
 Only `.sql` files are loaded, so this README is invisible to the runner.
 
@@ -18,9 +16,6 @@ snake_case description.
 | `002_add_user_email.sql` | Good    | —                                     |
 | `1_users.sql`            | Throws  | Version must be at least three digits |
 | `users.sql`              | Throws  | Runner requires a `NNN_` prefix       |
-
-Files are sorted by the parsed version number, not by filename. Padding is
-still the convention so listings stay readable.
 
 ## How they run
 
@@ -41,7 +36,7 @@ bun run --cwd server db:status
 
 ## `schema_migrations`
 
-The runner creates and maintains this bookkeeping table itself; it is not part
+The migrator creates and maintains this bookkeeping table itself; it is not part
 of your schema and needs no migration of its own.
 
 | Column        | Type    | Value                         |

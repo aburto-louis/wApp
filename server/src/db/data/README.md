@@ -2,8 +2,6 @@
 
 Runtime home of the SQLite database file.
 
-[`data/`](.) · [`migrations/`](../migrations/) · [`seeds/`](../seeds/)
-
 Git does not track empty directories. This file is the only tracked occupant —
 the directory is otherwise created on demand by `createDatabase()`.
 
@@ -14,10 +12,6 @@ the directory is otherwise created on demand by `createDatabase()`.
 | `db.sqlite`     |   No    | `../sqlite.ts`, on first connection |
 | `db.sqlite-wal` |   No    | SQLite — write-ahead log            |
 | `db.sqlite-shm` |   No    | SQLite — shared-memory index        |
-
-The `-wal` and `-shm` sidecars appear because `../sqlite.ts` opts into
-write-ahead logging with `PRAGMA journal_mode = WAL`. All three database files
-are ignored in `.gitignore`, so local data never leaves your machine.
 
 Override the location with `DB_PATH` when you need the file somewhere else.
 

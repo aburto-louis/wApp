@@ -1,6 +1,6 @@
-import app from "@server/app"
-import { pendingMigrations, runMigrations } from "@server/db/migrate"
-import { closeDatabase, db } from "@server/db/sqlite"
+import app from "./app"
+import { pendingMigrations, runMigrations } from "./db/migrate"
+import { closeDatabase, db } from "./db/sqlite"
 
 const port = Number(process.env.PORT ?? 3000)
 
@@ -25,7 +25,7 @@ try {
 
 const server = Bun.serve({ port, fetch: app.fetch })
 
-console.log(`recordbag server listening on ${server.url}`)
+console.log(`000 server listening on ${server.url}`)
 
 async function shutdown() {
   await server.stop()

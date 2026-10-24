@@ -1,8 +1,9 @@
 import { hc } from "hono/client"
-import type app from "@server/app"
+import type app from "./app"
 
-type AppType = typeof app
-export type Client = ReturnType<typeof hc<AppType>>
+export type { ClientResponse } from "hono/client"
+
+export type Client = ReturnType<typeof hc<typeof app>>
 
 export const hcWithType = (...args: Parameters<typeof hc>): Client =>
-  hc<AppType>(...args)
+  hc<typeof app>(...args)

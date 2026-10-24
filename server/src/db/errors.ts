@@ -29,32 +29,17 @@ export type DatabaseHttpError = {
 const DETAIL = /constraint failed: (.+)$/
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/
 
-/**
- * parse CONSTRAINT violation's offending fields
- * @param message to be parsed
- * @returns offending fields | undefined
- */
 function fieldsIn(message: string): string[] | undefined {
   const detail = DETAIL.exec(message)?.[1]
   if (!detail) return undefined
   return detail.split(", ").map((part) => part.split(".").at(-1) ?? part)
 }
 
-/**
- * parse CHECK violation's offending name
- * @param message to be parsed
- * @returns offending name | undefined
- */
 function constraintIn(message: string): string | undefined {
   const detail = DETAIL.exec(message)?.[1]
   return detail && IDENTIFIER.test(detail) ? detail : undefined
 }
 
-/**
- * maps SQLiteError to HttpError
- * @param error
- * @returns HttpError | null
- */
 export function toHttpError(error: unknown): DatabaseHttpError | null {
   if (!(error instanceof SQLiteError)) return null
 

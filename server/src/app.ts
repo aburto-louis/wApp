@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
-import { ZodError } from "zod"
-import { toHttpError } from "@server/db/errors"
+import { prettifyError, ZodError } from "zod"
+import { toHttpError } from "./db/errors"
 
 const app = new Hono()
 
@@ -13,7 +13,10 @@ const app = new Hono()
     }
 
     if (err instanceof ZodError) {
-      return c.json({ error: "Validation failed", issues: err.issues }, 400)
+      return c.json(
+        { error: "Validation failed", message: prettifyError(err) },
+        400
+      )
     }
 
     console.error(err)

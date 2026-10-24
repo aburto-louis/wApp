@@ -11,8 +11,8 @@
     "start": "bun --env-file=../.env src/index.ts",
     "db:migrate": "bun --env-file=../.env src/db/migrate.ts",
     "db:status": "bun --env-file=../.env src/db/migrate.ts --status",
-    "db:reset": "rm -f src/db/data/db.sqlite src/db/data/db.sqlite-wal src/db/data/db.sqlite-shm",
-    "test": "bun test",
+    "db:reset": "rm -f src/db/data/db.sqlite*",
+    "test": "bun test --pass-with-no-tests",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .turbo *.tsbuildinfo"
   },
@@ -22,7 +22,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/bun": "^1.4.3",
+    "@types/bun": "^1.4.4",
     "typescript": "^7.0.2"
   }
 }

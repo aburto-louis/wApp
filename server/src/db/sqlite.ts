@@ -10,14 +10,8 @@ function resolveDbPath(path: string): string {
   return path === MEMORY ? MEMORY : resolve(path)
 }
 
-/** `/absolute/path/to/db.sqlite` */
 export const DB_PATH = resolveDbPath(process.env.DB_PATH ?? DEFAULT_PATH)
 
-/**
- * creates db instance & applies connection pragmas
- * @param path absolute path to db
- * @returns db instance
- */
 export function createDatabase(path: string = DB_PATH): Database {
   const file = resolveDbPath(path)
 
@@ -39,7 +33,7 @@ export function createDatabase(path: string = DB_PATH): Database {
     if (journal?.journal_mode !== "wal") {
       db.close(true)
       throw new Error(
-        `could not enable WAL on ${file}` +
+        `Could not enable WAL on ${file}` +
           `journal_mode is "${journal?.journal_mode ?? "unknown"}"`
       )
     }
@@ -52,16 +46,11 @@ export function createDatabase(path: string = DB_PATH): Database {
 
 let instance: Database | undefined
 
-/**
- * if instance is undefined, creates new db instance
- * @returns db instance
- */
 export function getDatabase(): Database {
   instance ??= createDatabase()
   return instance
 }
 
-/** closes db & sets instance to undefined */
 export function closeDatabase(): void {
   if (!instance) return
 
@@ -73,11 +62,6 @@ export function closeDatabase(): void {
   instance = undefined
 }
 
-/**
- * opens on first property access rather than at import time
- *
- * importing this module never touches the filesystem
- */
 export const db = new Proxy({} as Database, {
   get(_target, property) {
     const database = getDatabase()

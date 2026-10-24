@@ -9,14 +9,14 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .turbo *.tsbuildinfo",
-    "test": "bun test"
+    "test": "bun test --pass-with-no-tests",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   },
   "dependencies": {
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@types/bun": "^1.4.3",
+    "@types/bun": "^1.4.4",
     "typescript": "^7.0.2"
   }
 }

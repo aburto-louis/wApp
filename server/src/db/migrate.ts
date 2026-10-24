@@ -1,12 +1,11 @@
 import { SQLiteError, type Database } from "bun:sqlite"
 import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
-import { createDatabase, DB_PATH } from "@server/db/sqlite"
+import { createDatabase, DB_PATH } from "./sqlite"
 
 const MIGRATIONS_DIR = join(import.meta.dir, "migrations")
 const FILENAME = /^(\d{3,})_([a-z0-9_]+)\.sql$/
 
-/** derived from file */
 export type Migration = {
   version: number
   name: string
@@ -15,7 +14,6 @@ export type Migration = {
   checksum: string
 }
 
-/** derived from db */
 export type AppliedMigration = {
   version: number
   name: string
@@ -30,7 +28,6 @@ export type MigrationStatus = {
   pending: Migration[]
 }
 
-/** version, file & err code */
 export class MigrationError extends Error {
   version: number
   file: string
@@ -41,7 +38,7 @@ export class MigrationError extends Error {
     const reason = cause instanceof Error ? cause.message : String(cause)
     const code = sqlite?.code ? ` [${sqlite.code}] ` : ""
 
-    super(`migration ${migration.file} failed ${code}: ${reason}`, { cause })
+    super(`Migration ${migration.file} failed ${code}: ${reason}`, { cause })
 
     this.name = "MigrationError"
     this.version = migration.version
@@ -50,26 +47,19 @@ export class MigrationError extends Error {
   }
 }
 
-/**
- * parse a migration file
- * @param dir for absolute path
- * @param file to be parsed
- * @returns migration data from file
- * @throws invalid file name | empty file
- */
 function read(dir: string, file: string): Migration {
   const [, version, name] = FILENAME.exec(file) ?? []
 
   if (!version || !name) {
     throw new Error(
-      `invalid migration filename: ${file} — expected NNN_name.sql`
+      `Invalid migration filename: ${file} — expected NNN_name.sql`
     )
   }
 
   const sql = readFileSync(join(dir, file), "utf8")
 
   if (sql.trim().length === 0) {
-    throw new Error(`migration ${file} is empty`)
+    throw new Error(`Migration ${file} is empty`)
   }
 
   return {
@@ -81,19 +71,13 @@ function read(dir: string, file: string): Migration {
   }
 }
 
-/**
- * read migration dir & parse entries
- * @param dir migrations directory
- * @returns list of migrations
- * @throws readdirSync Error & duplicate migration versions
- */
 export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
   let entries: string[]
 
   try {
     entries = readdirSync(dir)
   } catch (cause) {
-    throw new Error(`cannot read the migrations directory: ${dir}`, { cause })
+    throw new Error(`Cannot read the migrations directory: ${dir}`, { cause })
   }
 
   const migrations = entries
@@ -108,7 +92,7 @@ export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
 
     if (clash) {
       throw new Error(
-        `duplicate migration version ${migration.version}: ` +
+        `Duplicate migration version ${migration.version}: ` +
           `${clash} & ${migration.file}`
       )
     }
@@ -119,10 +103,6 @@ export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
   return migrations
 }
 
-/**
- * create migrations table if not exists
- * @param db
- */
 function ensureMigrationsTable(db: Database) {
   db.run(
     `
@@ -137,7 +117,6 @@ function ensureMigrationsTable(db: Database) {
   )
 }
 
-/** @returns list of migrations applied in db */
 function appliedMigrations(db: Database): AppliedMigration[] {
   return db
     .query(
@@ -150,15 +129,6 @@ function appliedMigrations(db: Database): AppliedMigration[] {
     .all() as AppliedMigration[]
 }
 
-/**
- * check files for pending migrations
- * @param db
- * @param migrations files to check
- * @returns list of migrations to apply
- * @throws an applied schema's file is missing
- * @throws applied migration doesn't match it's file
- * @throws pending migration numbered incorrectly
- */
 function pendingFrom(db: Database, migrations: Migration[]): Migration[] {
   const applied = appliedMigrations(db)
   const migrationByVersion = new Map(migrations.map((m) => [m.version, m]))
@@ -167,12 +137,12 @@ function pendingFrom(db: Database, migrations: Migration[]): Migration[] {
     const migration = migrationByVersion.get(row.version)
 
     if (!migration) {
-      throw new Error(`migration ${row.version} (${row.name}) file is missing`)
+      throw new Error(`Migration ${row.version} (${row.name}) file is missing`)
     }
 
     if (migration.checksum !== row.checksum) {
       throw new Error(
-        `migration ${migration.file} changed after it was applied`
+        `Migration ${migration.file} changed after it was applied`
       )
     }
   }
@@ -184,7 +154,7 @@ function pendingFrom(db: Database, migrations: Migration[]): Migration[] {
   for (const migration of pending) {
     if (migration.version < latest) {
       throw new Error(
-        `migration ${migration.file} is numbered below the latest applied`
+        `Migration ${migration.file} is numbered below the latest applied`
       )
     }
   }
@@ -215,7 +185,6 @@ function apply(db: Database, migration: Migration) {
   )
 }
 
-/** check for foreign key violations */
 function assertForeignKeysIntact(db: Database) {
   const violations = db.query("PRAGMA foreign_key_check").all()
 
@@ -227,12 +196,6 @@ function assertForeignKeysIntact(db: Database) {
   }
 }
 
-/**
- * apply migrations in single transaction
- * @param db
- * @param dir of migration files
- * @returns list of versions applied
- */
 export function runMigrations(
   db: Database,
   dir: string = MIGRATIONS_DIR
@@ -243,16 +206,12 @@ export function runMigrations(
 
   if (pendingFrom(db, migrations).length === 0) return []
 
-  // A table rebuild needs foreign keys off, and the pragma is a silent no-op
-  // inside a transaction, so the toggle has to wrap BEGIN rather than sit in it.
   const enforcing = foreignKeysEnabled(db)
   if (enforcing) db.run("PRAGMA foreign_keys = OFF")
 
   let ran: Migration[] = []
 
   try {
-    // IMMEDIATE takes the write lock up front, so a second process booting at
-    // the same time waits on busy_timeout instead of racing us.
     db.transaction(() => {
       ran = pendingFrom(db, migrations)
 
@@ -275,7 +234,6 @@ function foreignKeysEnabled(db: Database): boolean {
   return row?.foreign_keys === 1
 }
 
-/** @returns list of pending migrations */
 export function pendingMigrations(
   db: Database,
   dir: string = MIGRATIONS_DIR
@@ -285,9 +243,6 @@ export function pendingMigrations(
   return pendingFrom(db, loadMigrations(dir)).map(({ version }) => version)
 }
 
-/**
- * @returns curr version, list of applied & pending migrations
- */
 export function migrationStatus(
   db: Database,
   dir: string = MIGRATIONS_DIR
@@ -318,23 +273,23 @@ if (import.meta.main) {
     if (process.argv.includes("--status")) {
       const { current, applied, pending } = migrationStatus(db)
 
-      console.log(`database ${DB_PATH}`)
-      console.log(`current  ${current ?? "none"}`)
+      console.log(`Database ${DB_PATH}`)
+      console.log(`Current  ${current ?? "none"}`)
 
       for (const row of applied) {
         console.log(`applied ${row.version} ${row.name} (${row.duration_ms}ms)`)
       }
 
       for (const migration of pending) {
-        console.log(`pending  ${migration.version} ${migration.name}`)
+        console.log(`Pending  ${migration.version} ${migration.name}`)
       }
     } else {
       const ran = runMigrations(db)
 
       console.log(
         ran.length === 0
-          ? "no pending migrations"
-          : `applied migrations: ${ran.join(", ")}`
+          ? "No pending migrations"
+          : `Applied migrations: ${ran.join(", ")}`
       )
     }
   } catch (err) {
