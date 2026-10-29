@@ -255,7 +255,6 @@ export function migrationStatus(
   return { current: applied.at(-1)?.version ?? null, applied, pending }
 }
 
-/** @returns most recent applied version */
 export function currentVersion(db: Database): number | null {
   ensureMigrationsTable(db)
 
@@ -277,7 +276,7 @@ if (import.meta.main) {
       console.log(`Current  ${current ?? "none"}`)
 
       for (const row of applied) {
-        console.log(`applied ${row.version} ${row.name} (${row.duration_ms}ms)`)
+        console.log(`Applied ${row.version} ${row.name} (${row.duration_ms}ms)`)
       }
 
       for (const migration of pending) {

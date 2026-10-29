@@ -33,7 +33,7 @@ export function createDatabase(path: string = DB_PATH): Database {
     if (journal?.journal_mode !== "wal") {
       db.close(true)
       throw new Error(
-        `Could not enable WAL on ${file}` +
+        `Could not enable WAL on ${file}. ` +
           `journal_mode is "${journal?.journal_mode ?? "unknown"}"`
       )
     }

@@ -5,7 +5,7 @@ import { toHttpError } from "./db/errors"
 
 const app = new Hono()
 
-  // mount routes;
+  // Mount API routes.
 
   .onError((err, c) => {
     if (err instanceof HTTPException) {
